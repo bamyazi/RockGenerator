@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Rock Generator</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>Rock Generator</h1>
+    <p>Adjust parameters and click Generate</p>
+  </div>
+  <div id="controls-scroll">
+
+    <!-- SHAPE -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Shape
+      </div>
+      <div class="section-body">
+        <div class="select-row">
+          <label>Base Shape</label>
+          <select id="baseShape">
+            <option value="sphere">Sphere</option>
+            <option value="box">Box / Slab</option>
+            <option value="cylinder">Cylinder</option>
+            <option value="cone">Cone / Tapered</option>
+            <option value="torus">Torus / Ring</option>
+          </select>
+        </div>
+        <div class="select-row">
+          <label>Preset</label>
+          <select id="shapePreset">
+            <option value="none">— Custom —</option>
+            <option value="boulder">Boulder</option>
+            <option value="slab">Flat Slab</option>
+            <option value="stalactite">Stalactite</option>
+            <option value="stalagmite">Stalagmite</option>
+            <option value="column">Column / Pillar</option>
+            <option value="ledge">Ledge / Shelf</option>
+            <option value="overhang">Overhang</option>
+            <option value="arch">Arch Fragment</option>
+            <option value="spike">Spike / Tooth</option>
+            <option value="rubble">Rubble Chunk</option>
+            <option value="wall">Cave Wall</option>
+            <option value="flowstone">Flowstone</option>
+          </select>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Base Size</span>
+          <input class="param-slider" type="range" id="baseSize" min="0.3" max="3" step="0.05" value="1">
+          <span class="param-value" id="baseSize-val">1.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Width Scale</span>
+          <input class="param-slider" type="range" id="widthScale" min="0.1" max="4" step="0.05" value="1">
+          <span class="param-value" id="widthScale-val">1.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Height Scale</span>
+          <input class="param-slider" type="range" id="heightScale" min="0.1" max="4" step="0.05" value="1">
+          <span class="param-value" id="heightScale-val">1.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Depth Scale</span>
+          <input class="param-slider" type="range" id="depthScale" min="0.1" max="4" step="0.05" value="1">
+          <span class="param-value" id="depthScale-val">1.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Detail Level</span>
+          <input class="param-slider" type="range" id="detail" min="1" max="4" step="1" value="2">
+          <span class="param-value" id="detail-val">2</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Flatness</span>
+          <input class="param-slider" type="range" id="flatness" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="flatness-val">0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WARPING & SHAPE MODIFIERS -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Warping &amp; Deformation
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Domain Warp</span>
+          <input class="param-slider" type="range" id="domainWarp" min="0" max="1.5" step="0.05" value="0">
+          <span class="param-value" id="domainWarp-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Warp Scale</span>
+          <input class="param-slider" type="range" id="warpScale" min="0.3" max="4" step="0.1" value="1.2">
+          <span class="param-value" id="warpScale-val">1.2</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Warp Octaves</span>
+          <input class="param-slider" type="range" id="warpOctaves" min="1" max="4" step="1" value="2">
+          <span class="param-value" id="warpOctaves-val">2</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Taper Top</span>
+          <input class="param-slider" type="range" id="taperTop" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="taperTop-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Taper Bottom</span>
+          <input class="param-slider" type="range" id="taperBottom" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="taperBottom-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Twist</span>
+          <input class="param-slider" type="range" id="twist" min="0" max="3" step="0.1" value="0">
+          <span class="param-value" id="twist-val">0.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Skew X</span>
+          <input class="param-slider" type="range" id="skewX" min="-1" max="1" step="0.05" value="0">
+          <span class="param-value" id="skewX-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Skew Z</span>
+          <input class="param-slider" type="range" id="skewZ" min="-1" max="1" step="0.05" value="0">
+          <span class="param-value" id="skewZ-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Concavity</span>
+          <input class="param-slider" type="range" id="concavity" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="concavity-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Concavity Dir</span>
+          <input class="param-slider" type="range" id="concavityDir" min="0" max="5" step="1" value="0">
+          <span class="param-value" id="concavityDir-val">0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Bulge</span>
+          <input class="param-slider" type="range" id="bulge" min="-1" max="1" step="0.05" value="0">
+          <span class="param-value" id="bulge-val">0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MACRO (Large Features) -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Large Features
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Strength</span>
+          <input class="param-slider" type="range" id="macroStrength" min="0" max="1" step="0.01" value="0.45">
+          <span class="param-value" id="macroStrength-val">0.45</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Scale</span>
+          <input class="param-slider" type="range" id="macroScale" min="0.3" max="3" step="0.1" value="0.8">
+          <span class="param-value" id="macroScale-val">0.8</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Octaves</span>
+          <input class="param-slider" type="range" id="macroOctaves" min="1" max="4" step="1" value="2">
+          <span class="param-value" id="macroOctaves-val">2</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Ridge Mix</span>
+          <input class="param-slider" type="range" id="macroRidge" min="0" max="1" step="0.05" value="0.3">
+          <span class="param-value" id="macroRidge-val">0.30</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESO (Medium Features) -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Medium Features
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Strength</span>
+          <input class="param-slider" type="range" id="mesoStrength" min="0" max="0.6" step="0.01" value="0.2">
+          <span class="param-value" id="mesoStrength-val">0.20</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Scale</span>
+          <input class="param-slider" type="range" id="mesoScale" min="1" max="8" step="0.25" value="3">
+          <span class="param-value" id="mesoScale-val">3.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Octaves</span>
+          <input class="param-slider" type="range" id="mesoOctaves" min="1" max="5" step="1" value="3">
+          <span class="param-value" id="mesoOctaves-val">3</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Sharp Edges</span>
+          <input class="param-slider" type="range" id="sharpness" min="0" max="1" step="0.05" value="0.15">
+          <span class="param-value" id="sharpness-val">0.15</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Subdivisions</span>
+          <input class="param-slider" type="range" id="mesoSubdivs" min="0" max="2" step="1" value="1">
+          <span class="param-value" id="mesoSubdivs-val">1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MICRO (Fine Detail) -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Fine Detail
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Strength</span>
+          <input class="param-slider" type="range" id="microStrength" min="0" max="0.3" step="0.005" value="0.08">
+          <span class="param-value" id="microStrength-val">0.080</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Scale</span>
+          <input class="param-slider" type="range" id="microScale" min="4" max="20" step="0.5" value="8">
+          <span class="param-value" id="microScale-val">8.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Octaves</span>
+          <input class="param-slider" type="range" id="microOctaves" min="1" max="6" step="1" value="4">
+          <span class="param-value" id="microOctaves-val">4</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Erosion</span>
+          <input class="param-slider" type="range" id="erosion" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="erosion-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Subdivisions</span>
+          <input class="param-slider" type="range" id="microSubdivs" min="0" max="2" step="1" value="1">
+          <span class="param-value" id="microSubdivs-val">1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRACKS & DETAIL -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Cracks &amp; Detail
+      </div>
+      <div class="section-body">
+        <div class="select-row">
+          <label>Crack Pattern</label>
+          <select id="crackAlgo">
+            <option value="ridge">Ridge Noise</option>
+            <option value="voronoi">Voronoi Edges</option>
+            <option value="warp">Warped Lines</option>
+            <option value="branch">Branching</option>
+            <option value="shatter">Shatter</option>
+            <option value="planar">Planar Fractures</option>
+            <option value="horizontal">Horizontal Layers</option>
+            <option value="vertical">Vertical Splits</option>
+            <option value="path">Path Noise</option>
+          </select>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Crack Depth</span>
+          <input class="param-slider" type="range" id="crackDepth" min="0" max="0.5" step="0.01" value="0">
+          <span class="param-value" id="crackDepth-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Crack Width</span>
+          <input class="param-slider" type="range" id="crackWidth" min="0.01" max="0.4" step="0.01" value="0.12">
+          <span class="param-value" id="crackWidth-val">0.12</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Crack Density</span>
+          <input class="param-slider" type="range" id="crackDensity" min="1" max="10" step="0.5" value="3">
+          <span class="param-value" id="crackDensity-val">3.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Crack Subdivs</span>
+          <input class="param-slider" type="range" id="crackSubdivs" min="0" max="3" step="1" value="1">
+          <span class="param-value" id="crackSubdivs-val">1</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Pitting</span>
+          <input class="param-slider" type="range" id="pitting" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="pitting-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Pit Size</span>
+          <input class="param-slider" type="range" id="pitSize" min="3" max="20" step="0.5" value="8">
+          <span class="param-value" id="pitSize-val">8.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Bump Intensity</span>
+          <input class="param-slider" type="range" id="bumpIntensity" min="0" max="2" step="0.05" value="0.8">
+          <span class="param-value" id="bumpIntensity-val">0.80</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Normal Strength</span>
+          <input class="param-slider" type="range" id="normalStrength" min="0" max="3" step="0.05" value="1.0">
+          <span class="param-value" id="normalStrength-val">1.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Micro Normal</span>
+          <input class="param-slider" type="range" id="microNormalScale" min="1" max="30" step="0.5" value="12">
+          <span class="param-value" id="microNormalScale-val">12.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Micro Normal Str</span>
+          <input class="param-slider" type="range" id="microNormalStrength" min="0" max="1.5" step="0.05" value="0.4">
+          <span class="param-value" id="microNormalStrength-val">0.40</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXTURE -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Texture
+      </div>
+      <div class="section-body">
+        <div class="select-row">
+          <label>Rock Type</label>
+          <select id="rockType">
+            <option value="granite">Granite</option>
+            <option value="sandstone">Sandstone</option>
+            <option value="slate">Slate</option>
+            <option value="limestone">Limestone</option>
+            <option value="basalt">Basalt</option>
+            <option value="marble">Marble</option>
+            <option value="obsidian">Obsidian</option>
+            <option value="mossy">Mossy</option>
+          </select>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Texture Scale</span>
+          <input class="param-slider" type="range" id="textureScale" min="0.5" max="8" step="0.25" value="3">
+          <span class="param-value" id="textureScale-val">3.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Color Variation</span>
+          <input class="param-slider" type="range" id="colorVariation" min="0" max="1" step="0.05" value="0.3">
+          <span class="param-value" id="colorVariation-val">0.30</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Texture Detail</span>
+          <input class="param-slider" type="range" id="textureDetail" min="1" max="6" step="1" value="4">
+          <span class="param-value" id="textureDetail-val">4</span>
+        </div>
+        <div class="color-row">
+          <label>Primary Color</label>
+          <input type="color" id="colorPrimary" value="#7a7a6e">
+        </div>
+        <div class="color-row">
+          <label>Secondary Color</label>
+          <input type="color" id="colorSecondary" value="#5a5a4e">
+        </div>
+        <div class="param-row">
+          <span class="param-label">Metalness</span>
+          <input class="param-slider" type="range" id="metalness" min="0" max="1" step="0.01" value="0.05">
+          <span class="param-value" id="metalness-val">0.05</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Roughness Map</span>
+          <input class="param-slider" type="range" id="roughnessMap" min="0" max="1" step="0.01" value="0.85">
+          <span class="param-value" id="roughnessMap-val">0.85</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Strata</span>
+          <input class="param-slider" type="range" id="strataStrength" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="strataStrength-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Mineral Density</span>
+          <input class="param-slider" type="range" id="mineralDensity" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="mineralDensity-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Weathering</span>
+          <input class="param-slider" type="range" id="weathering" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="weathering-val">0.00</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Grain Scale</span>
+          <input class="param-slider" type="range" id="grainScale" min="1" max="25" step="0.5" value="6">
+          <span class="param-value" id="grainScale-val">6.0</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Grain Strength</span>
+          <input class="param-slider" type="range" id="grainStrength" min="0" max="1" step="0.05" value="0.3">
+          <span class="param-value" id="grainStrength-val">0.30</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Roughness Var</span>
+          <input class="param-slider" type="range" id="roughnessVariation" min="0" max="0.5" step="0.01" value="0.15">
+          <span class="param-value" id="roughnessVariation-val">0.15</span>
+        </div>
+        <div class="color-row">
+          <label>Tertiary Color</label>
+          <input type="color" id="colorTertiary" value="#4a4a3e">
+        </div>
+      </div>
+    </div>
+
+    <!-- POST-PROCESS EFFECTS (injected by registered effect plugins) -->
+    <div id="effects-container"></div>
+
+    <!-- LIGHTING -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Lighting
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Key Light</span>
+          <input class="param-slider" type="range" id="keyLight" min="0" max="3" step="0.1" value="1.2">
+          <span class="param-value" id="keyLight-val">1.20</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Fill Light</span>
+          <input class="param-slider" type="range" id="fillLight" min="0" max="2" step="0.1" value="0.5">
+          <span class="param-value" id="fillLight-val">0.50</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Ambient</span>
+          <input class="param-slider" type="range" id="ambientLight" min="0" max="1" step="0.05" value="0.3">
+          <span class="param-value" id="ambientLight-val">0.30</span>
+        </div>
+        <div class="color-row">
+          <label>Light Color</label>
+          <input type="color" id="lightColor" value="#ffffff">
+        </div>
+        <div class="color-row">
+          <label>Background</label>
+          <input type="color" id="bgColor" value="#111111">
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="showGrid" checked>
+          <label for="showGrid">Show Ground Grid</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="autoRotate">
+          <label for="autoRotate">Auto Rotate</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="useHDRI" checked>
+          <label for="useHDRI">HDRI Environment</label>
+        </div>
+        <div class="param-row">
+          <span class="param-label">SSS Strength</span>
+          <input class="param-slider" type="range" id="sssStrength" min="0" max="1" step="0.05" value="0">
+          <span class="param-value" id="sssStrength-val">0.00</span>
+        </div>
+        <div class="color-row">
+          <label>SSS Color</label>
+          <input type="color" id="sssColor" value="#c8a882">
+        </div>
+      </div>
+    </div>
+
+    <!-- MESH OPTIMIZATION -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Mesh Optimization
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Decimation</span>
+          <input class="param-slider" type="range" id="decimation" min="0.05" max="0.9" step="0.05" value="0.5">
+          <span class="param-value" id="decimation-val">0.50</span>
+        </div>
+        <div class="btn-row" style="margin-top:6px">
+          <button class="btn btn-secondary" onclick="applyDecimation()" style="width:100%">&#9986; Apply Decimation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEED / RANDOMIZATION -->
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">&#9660;</span> Randomization
+      </div>
+      <div class="section-body">
+        <div class="param-row">
+          <span class="param-label">Seed</span>
+          <input class="param-slider" type="range" id="seed" min="0" max="9999" step="1" value="42">
+          <span class="param-value" id="seed-val">42</span>
+        </div>
+        <div class="param-row">
+          <span class="param-label">Variation Drift</span>
+          <input class="param-slider" type="range" id="variationDrift" min="0" max="0.3" step="0.01" value="0.05">
+          <span class="param-value" id="variationDrift-val">0.05</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live toggle -->
+  <div style="padding: 6px 20px 0; display:flex; align-items:center; gap:8px; flex-shrink:0;">
+    <input type="checkbox" id="liveUpdate" checked style="accent-color:var(--highlight);cursor:pointer">
+    <label for="liveUpdate" style="font-size:12px;color:var(--text-dim);cursor:pointer">Live Preview</label>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generateRock()">&#9654; Generate</button>
+    <button class="btn btn-secondary" onclick="generateVariation()">&#127920; Variation</button>
+    <button class="btn btn-secondary" onclick="randomizeAll()">&#127922; Random</button>
+    <button class="btn btn-secondary" onclick="resetToDefaults()">&#8635; Reset</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="exportGLB()">&#128190; Export GLB</button>
+    <button class="btn btn-secondary" onclick="exportOBJ()">&#128190; Export OBJ</button>
+    <button class="btn btn-secondary" onclick="saveParams()">&#128229; Save Params</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="exportTextures()">&#127912; Export Textures</button>
+    <button class="btn btn-secondary" onclick="exportLODs()">&#128200; Export LODs</button>
+    <button class="btn btn-secondary" onclick="exportForGodot()">&#128302; Export Godot</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="document.getElementById('loadParamsInput').click()">&#128228; Load Params</button>
+    <input type="file" id="loadParamsInput" accept=".json" style="display:none" onchange="loadParams(event)">
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="exportAllZip()" style="flex:1">&#128230; Download All (ZIP)</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VIEWPORT
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="viewport">
+  <div id="viewport-controls">
+    <button class="vp-btn" onclick="resetCamera()" title="Reset Camera">&#8634;</button>
+    <button class="vp-btn" onclick="toggleWireframe()" title="Toggle Wireframe">&#9649;</button>
+    <button class="vp-btn" onclick="screenshotRock()" title="Screenshot">&#128247;</button>
+  </div>
+  <div id="viewport-info">LMB: Rotate &nbsp;|&nbsp; RMB: Pan &nbsp;|&nbsp; Scroll: Zoom</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- JSZip (used by exporters.js for zip downloads) -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<!-- Three.js import map — resolves bare specifiers used throughout src/ -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- Application entry point -->
+<script type="module" src="src/main.js"></script>
+
+</body>
+</html>
