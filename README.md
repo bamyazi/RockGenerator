@@ -2,6 +2,8 @@
 
 A browser-based procedural rock generator built with **Three.js**. Create realistic, game-ready 3D rocks entirely in the browser — no server, no build step, no installs.
 
+**[Live Demo](https://bamyazi.github.io/RockGenerator/)**
+
 ![Rock Generator Screenshot](screenshot.png)
 
 ## Features
@@ -22,8 +24,8 @@ A browser-based procedural rock generator built with **Three.js**. Create realis
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/rock-generator.git
-   cd rock-generator
+   git clone https://github.com/bamyazi/RockGenerator.git
+   cd RockGenerator
    ```
 
 2. **Start a local HTTP server** (required for ES module imports)
